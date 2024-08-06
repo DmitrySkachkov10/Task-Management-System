@@ -12,3 +12,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/task_management_system
     username: postgres
     password: postgres
+
+app:
+  jwt:
+    secret: mySecret
+    issuer: MyIssuer
