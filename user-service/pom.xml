@@ -76,7 +76,11 @@
             <version>6.0.0</version> <!-- Убедитесь, что версия соответствует вашему серверу приложений -->
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>by.dmitry_skachkov</groupId>
+            <artifactId>exception</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
