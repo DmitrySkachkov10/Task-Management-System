@@ -26,6 +26,13 @@
         <module>user-service</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>by.dmitry_skachkov</groupId>
+            <artifactId>exception</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+    </dependencies>
     <dependencyManagement>
         <dependencies>
             <dependency>
