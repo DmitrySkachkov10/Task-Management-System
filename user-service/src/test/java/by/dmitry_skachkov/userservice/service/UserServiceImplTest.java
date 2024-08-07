@@ -1,13 +1,10 @@
 package by.dmitry_skachkov.userservice.service;
 
 import by.dmitry_skachkov.userservice.core.dto.UserDTO;
-import by.dmitry_skachkov.userservice.core.utils.EmailValidator;
-import by.dmitry_skachkov.userservice.entity.UserEntity;
 import by.dmitry_skachkov.userservice.repo.UserRepo;
 
 import by.dmitryskachkov.exception.exceptions.email.EmailAlreadyExistsException;
 import by.dmitryskachkov.exception.exceptions.email.InvalidEmailFormatException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

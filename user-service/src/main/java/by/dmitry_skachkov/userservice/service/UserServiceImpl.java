@@ -4,7 +4,7 @@ import by.dmitry_skachkov.userservice.core.dto.UserDTO;
 import by.dmitry_skachkov.userservice.core.utils.EmailValidator;
 import by.dmitry_skachkov.userservice.core.utils.JwtTokenHandler;
 import by.dmitry_skachkov.userservice.core.utils.UserAuth;
-import by.dmitry_skachkov.userservice.entity.UserEntity;
+import by.dmitry_skachkov.userservice.repo.entity.UserEntity;
 import by.dmitry_skachkov.userservice.repo.UserRepo;
 import by.dmitry_skachkov.userservice.service.api.UserService;
 import by.dmitryskachkov.exception.exceptions.ValidationException;
@@ -24,8 +24,6 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
     private final UserRepo userRepo;
 
     private final PasswordEncoder passwordEncoder;
@@ -42,15 +40,12 @@ public class UserServiceImpl implements UserService {
     public void createUser(UserDTO userDTO) {
 
         final String email = userDTO.getEmail();
-        logger.info("Creating user with email: {}", email);
 
         if (!EmailValidator.isValidEmail(email)) {
-            logger.error("Invalid email format: {}", email);
             throw new InvalidEmailFormatException("Invalid email format");
         }
 
         if (userRepo.existsByEmail(email)) {
-            logger.error("Email already exists: {}", email);
             throw new EmailAlreadyExistsException("Email already exists");
         }
         try {
@@ -58,30 +53,22 @@ public class UserServiceImpl implements UserService {
                     UUID.randomUUID(),
                     userDTO.getEmail(),
                     passwordEncoder.encode(userDTO.getPassword())));
-            logger.info("User created successfully with email: {}", email);
         } catch (DataIntegrityViolationException e) {
-            logger.error("Data integrity violation when creating user with email: {}", email, e);
             throw new EmailAlreadyExistsException("Email already exists");
         }
     }
 
     @Override
     public String logIn(UserDTO userDTO) {
-        logger.info("Logging in user with email: {}", userDTO.getEmail());
 
         UserEntity userEntity = userRepo.findByEmail(userDTO.getEmail())
-                .orElseThrow(() -> {
-                    logger.error("Invalid email or password for email: {}", userDTO.getEmail());
-                    return new ValidationException("Invalid email or password");
-                });
+                .orElseThrow(() ->  new ValidationException("Invalid email or password"));
 
         if (!BCrypt.checkpw(userDTO.getPassword(), userEntity.getPassword())) {
-            logger.error("Invalid password for email: {}", userDTO.getEmail());
-            throw new ValidationException("Invalid input data");
+            throw new ValidationException("Invalid email or password");
         }
 
         String token = tokenHandler.generateAccessToken(new UserAuth(userEntity.getUuid().toString()));
-        logger.info("User logged in successfully with email: {}", userDTO.getEmail());
         return token;
     }
 }
