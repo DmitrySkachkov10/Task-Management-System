@@ -2,6 +2,7 @@ package by.dmitry_skachkov.userservice.core.filter;
 
 import by.dmitry_skachkov.userservice.core.utils.JwtTokenHandler;
 import by.dmitry_skachkov.userservice.core.utils.UserAuth;
+import by.dmitryskachkov.exception.exceptions.TokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(request, response);
-        } catch (TokenException e) { //todo TokenException
+        } catch (TokenException e) {
             handleVerificationError(response, e);
         }
 
