@@ -1,9 +1,11 @@
 package by.dmitry_skachkov.userservice.core.utils;
 
 import by.dmitry_skachkov.userservice.conf.properties.JwtProperty;
+import by.dmitryskachkov.exception.exceptions.TokenException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,29 +67,29 @@ public class JwtTokenHandler {
     }
 
     public boolean validate(String token) {
-//        try {
+        try {
         Jwts.parser().setSigningKey(property.getSecret()).parseClaimsJws(token);
         return true;
-//        } catch (SignatureException ex) {
-//            TokenError error = new TokenError("Invalid JWT signature");
-//            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
-//            throw error;
-//        } catch (MalformedJwtException ex) {
-//            TokenError error = new TokenError("Invalid JWT token");
-//            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
-//            throw error;
-//        } catch (ExpiredJwtException ex) {
-//            TokenError error = new TokenError("Expired JWT token");
-//            error.setHttpStatusCode(HttpStatus.FORBIDDEN);
-//            throw error;
-//        } catch (UnsupportedJwtException ex) {
-//            TokenError error = new TokenError("Unsupported JWT token");
-//            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
-//            throw error;
-//        } catch (IllegalArgumentException ex) {
-//            TokenError error = new TokenError("JWT claims string is empty");
-//            error.setHttpStatusCode(HttpStatus.BAD_REQUEST);
-//            throw error;
-//        }
-    } //todo create token Exception class
+        } catch (SignatureException ex) {
+            TokenException e = new TokenException("Invalid JWT signature");
+            e.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw e;
+        } catch (MalformedJwtException ex) {
+            TokenException e = new TokenException("Invalid JWT token");
+            e.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw e;
+        } catch (ExpiredJwtException ex) {
+            TokenException e = new TokenException("Expired JWT token");
+            e.setHttpStatusCode(HttpStatus.FORBIDDEN);
+            throw e;
+        } catch (UnsupportedJwtException ex) {
+            TokenException e = new TokenException("Unsupported JWT token");
+            e.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw e;
+        } catch (IllegalArgumentException ex) {
+            TokenException e = new TokenException("JWT claims string is empty");
+            e.setHttpStatusCode(HttpStatus.BAD_REQUEST);
+            throw e;
+        }
+    }
 }
