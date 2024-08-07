@@ -1,6 +1,6 @@
 package by.dmitry_skachkov.userservice.repo;
 
-import by.dmitry_skachkov.userservice.entity.UserEntity;
+import by.dmitry_skachkov.userservice.repo.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

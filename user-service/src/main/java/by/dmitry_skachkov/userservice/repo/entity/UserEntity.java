@@ -1,4 +1,4 @@
-package by.dmitry_skachkov.userservice.entity;
+package by.dmitry_skachkov.userservice.repo.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
