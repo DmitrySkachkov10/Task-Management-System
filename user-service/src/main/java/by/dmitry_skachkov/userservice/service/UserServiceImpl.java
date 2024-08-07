@@ -1,41 +1,65 @@
 package by.dmitry_skachkov.userservice.service;
 
 import by.dmitry_skachkov.userservice.core.dto.UserDTO;
+import by.dmitry_skachkov.userservice.core.utils.EmailValidator;
+import by.dmitry_skachkov.userservice.core.utils.JwtTokenHandler;
+import by.dmitry_skachkov.userservice.core.utils.UserAuth;
 import by.dmitry_skachkov.userservice.entity.UserEntity;
 import by.dmitry_skachkov.userservice.repo.UserRepo;
 import by.dmitry_skachkov.userservice.service.api.UserService;
+import by.dmitryskachkov.exception.exceptions.ValidationException;
+import by.dmitryskachkov.exception.exceptions.email.EmailAlreadyExistsException;
+import by.dmitryskachkov.exception.exceptions.email.InvalidEmailFormatException;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-public class UserServiceImpl implements UserService {
 
+@Service
+public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
 
-    public UserServiceImpl(UserRepo userRepo) {
+    public final JwtTokenHandler tokenHandler;
+
+    public UserServiceImpl(UserRepo userRepo, JwtTokenHandler tokenHandler) {
         this.userRepo = userRepo;
+        this.tokenHandler = tokenHandler;
     }
 
     @Override
     @Transactional
     public void createUser(UserDTO userDTO) {
-        if (userRepo.existsByEmail(userDTO.getEmail())) {
-            throw new RuntimeException("email already exists"); //todo create custom exception
+
+        final String email = userDTO.getEmail();
+
+        if (!EmailValidator.isValidEmail(email)) {
+            throw new InvalidEmailFormatException("Invalid email format");
         }
-        userRepo.save(new UserEntity(
-                UUID.randomUUID(),
-                userDTO.getEmail(),
-                userDTO.getPassword())
-        );
+
+        if (userRepo.existsByEmail(email)) {
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
+        try {
+            userRepo.save(new UserEntity(
+                    UUID.randomUUID(),
+                    userDTO.getEmail(),
+                    BCrypt.hashpw(userDTO.getPassword(), BCrypt.gensalt())));
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyExistsException("Email already exists"); //todo log другой
+        }
     }
 
     @Override
-    public void logIn(UserDTO userDTO) {
-        
-    }
+    public String logIn(UserDTO userDTO) {
+        UserEntity userEntity = userRepo.findByEmail(userDTO.getEmail());
 
-    @Override
-    public UserDTO myInfo() {
-        return null;
+        if (BCrypt.checkpw(userDTO.getPassword(), userEntity.getPassword())) {
+            throw new ValidationException("Invalid input data");
+        }
+        return tokenHandler.generateAccessToken(new UserAuth(userEntity.getUuid().toString()));
     }
 }

@@ -7,7 +7,6 @@ public interface UserService {
 
     void createUser(UserDTO userDTO);
 
-    void logIn(UserDTO userDTO);
+    String logIn(UserDTO userDTO);
 
-    UserDTO myInfo();
 }
