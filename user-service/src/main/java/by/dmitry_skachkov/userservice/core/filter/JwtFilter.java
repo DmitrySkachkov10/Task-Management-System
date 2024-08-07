@@ -31,10 +31,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (header.isEmpty() || !header.startsWith("Bearer ")) {
+
+        if (header == null || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
+
         final String token = header.split(" ")[1].trim();
         try {
             if (!jwtTokenHandler.validate(token)) {
@@ -44,10 +46,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
             UserAuth userAuth = jwtTokenHandler.getUser(token);
 
-            UsernamePasswordAuthenticationToken
-                    authentication = new UsernamePasswordAuthenticationToken(
-                    userAuth, null,
-                    null
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userAuth, null, null
             );
 
             authentication.setDetails(
@@ -59,7 +59,6 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (TokenException e) {
             handleVerificationError(response, e);
         }
-
     }
 
     private void handleVerificationError(HttpServletResponse response, TokenException e) throws IOException {

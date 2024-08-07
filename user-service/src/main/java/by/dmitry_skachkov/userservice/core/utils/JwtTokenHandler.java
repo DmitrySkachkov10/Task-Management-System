@@ -20,8 +20,9 @@ public class JwtTokenHandler {
     private JwtProperty property;
     private ObjectMapper objectMapper;
 
-    public JwtTokenHandler(JwtProperty property) {
+    public JwtTokenHandler(JwtProperty property, ObjectMapper objectMapper) {
         this.property = property;
+        this.objectMapper = objectMapper;
     }
 
     public String generateAccessToken(UserAuth userAuth) {
@@ -36,6 +37,7 @@ public class JwtTokenHandler {
             addToContext(userAuth);
             return token;
         } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(); //todo
         }
     }
@@ -68,8 +70,8 @@ public class JwtTokenHandler {
 
     public boolean validate(String token) {
         try {
-        Jwts.parser().setSigningKey(property.getSecret()).parseClaimsJws(token);
-        return true;
+            Jwts.parser().setSigningKey(property.getSecret()).parseClaimsJws(token);
+            return true;
         } catch (SignatureException ex) {
             TokenException e = new TokenException("Invalid JWT signature");
             e.setHttpStatusCode(HttpStatus.UNAUTHORIZED);

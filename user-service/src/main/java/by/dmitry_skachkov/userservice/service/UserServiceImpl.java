@@ -12,7 +12,6 @@ import by.dmitryskachkov.exception.exceptions.email.EmailAlreadyExistsException;
 import by.dmitryskachkov.exception.exceptions.email.InvalidEmailFormatException;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
     public String logIn(UserDTO userDTO) {
         UserEntity userEntity = userRepo.findByEmail(userDTO.getEmail());
 
-        if (BCrypt.checkpw(userDTO.getPassword(), userEntity.getPassword())) {
+        if (!BCrypt.checkpw(userDTO.getPassword(), userEntity.getPassword())) {
             throw new ValidationException("Invalid input data");
         }
         return tokenHandler.generateAccessToken(new UserAuth(userEntity.getUuid().toString()));
