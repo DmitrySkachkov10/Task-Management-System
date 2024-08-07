@@ -38,7 +38,9 @@ public class SecurityConfig {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         }))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .anyRequest().permitAll()) //todo потом пересмотреть еще
+                        .requestMatchers("/user/login").permitAll()
+                        .requestMatchers("/user/registrate").permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
