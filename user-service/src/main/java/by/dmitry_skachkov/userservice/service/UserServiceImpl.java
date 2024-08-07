@@ -13,6 +13,7 @@ import by.dmitryskachkov.exception.exceptions.email.InvalidEmailFormatException;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -22,10 +23,12 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
 
+    private final PasswordEncoder passwordEncoder;
     public final JwtTokenHandler tokenHandler;
 
-    public UserServiceImpl(UserRepo userRepo, JwtTokenHandler tokenHandler) {
+    public UserServiceImpl(UserRepo userRepo, PasswordEncoder passwordEncoder, JwtTokenHandler tokenHandler) {
         this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
         this.tokenHandler = tokenHandler;
     }
 
@@ -46,7 +49,7 @@ public class UserServiceImpl implements UserService {
             userRepo.save(new UserEntity(
                     UUID.randomUUID(),
                     userDTO.getEmail(),
-                    BCrypt.hashpw(userDTO.getPassword(), BCrypt.gensalt())));
+                    passwordEncoder.encode(userDTO.getPassword())));
         } catch (DataIntegrityViolationException e) {
             throw new EmailAlreadyExistsException("Email already exists"); //todo log другой
         }
@@ -54,7 +57,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String logIn(UserDTO userDTO) {
-        UserEntity userEntity = userRepo.findByEmail(userDTO.getEmail());
+        UserEntity userEntity = userRepo.findByEmail(userDTO.getEmail())
+                .orElseThrow(() -> new ValidationException("Invalid email or password"));
 
         if (!BCrypt.checkpw(userDTO.getPassword(), userEntity.getPassword())) {
             throw new ValidationException("Invalid input data");
