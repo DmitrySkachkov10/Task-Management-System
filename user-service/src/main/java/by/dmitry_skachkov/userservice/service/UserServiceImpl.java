@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepo.findByEmail(userLogin.getEmail())
                 .orElseThrow(() -> new ValidationException("Invalid email or password"));
 
-        if (!BCrypt.checkpw(userEntity.getPassword(), userEntity.getPassword())) {
+        if (!BCrypt.checkpw(userLogin.getPassword(), userEntity.getPassword())) {
             throw new ValidationException("Invalid email or password");
         }
 
