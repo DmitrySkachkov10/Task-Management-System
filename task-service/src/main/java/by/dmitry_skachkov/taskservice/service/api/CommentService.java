@@ -1,7 +1,7 @@
 package by.dmitry_skachkov.taskservice.service.api;
 
-import java.util.UUID;
+import by.dmitry_skachkov.taskservice.core.dto.comment.CreateCommentDto;
 
 public interface CommentService {
-    void addComment(String comment, UUID taskUuid);
+    void addComment(CreateCommentDto commentDto);
 }

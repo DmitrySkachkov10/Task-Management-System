@@ -1,10 +1,9 @@
 package by.dmitry_skachkov.taskservice.service;
 
+import by.dmitry_skachkov.taskservice.core.dto.comment.CreateCommentDto;
 import by.dmitry_skachkov.taskservice.repo.api.CommentRepo;
 import by.dmitry_skachkov.taskservice.service.api.CommentService;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -15,7 +14,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void addComment(String comment, UUID taskUuid) {
+    public void addComment(CreateCommentDto commentDto) {
 
     }
 }
