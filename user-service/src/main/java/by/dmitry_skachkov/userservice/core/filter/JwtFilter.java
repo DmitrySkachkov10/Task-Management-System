@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 @Component
@@ -61,6 +62,15 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * This method is necessary in the filter to handle and respond to verification errors.
+     * It is called before the GlobalHandlerController can be invoked, so it directly writes
+     * the error response to the HttpServletResponse.
+     *
+     * @param response used to write the response
+     * @param e        contains information about the Exception and  http status
+     * @throws IOException
+     **/
     private void handleVerificationError(HttpServletResponse response, TokenException e) throws IOException {
         response.setStatus(e.getHttpStatusCode().value());
         response.setContentType("application/json");
