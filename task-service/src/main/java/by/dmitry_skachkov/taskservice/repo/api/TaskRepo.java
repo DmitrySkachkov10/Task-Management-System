@@ -1,0 +1,17 @@
+package by.dmitry_skachkov.taskservice.repo.api;
+
+import by.dmitry_skachkov.taskservice.core.dto.PageOfTask;
+import by.dmitry_skachkov.taskservice.core.dto.TaskCreateDto;
+import by.dmitry_skachkov.taskservice.repo.entity.Task;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
+
+@Repository
+public interface TaskRepo extends JpaRepository<Task, UUID> {
+
+
+
+
+}
