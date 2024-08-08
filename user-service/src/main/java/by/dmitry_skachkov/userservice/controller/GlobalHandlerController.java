@@ -4,7 +4,6 @@ package by.dmitry_skachkov.userservice.controller;
 import by.dmitryskachkov.dto.ExcepionResponseDto;
 import by.dmitryskachkov.exception.exceptions.ValidationException;
 import by.dmitryskachkov.exception.exceptions.email.EmailAlreadyExistsException;
-import by.dmitryskachkov.exception.exceptions.email.InvalidEmailFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,8 +19,6 @@ public class GlobalHandlerController {
 
         if (e instanceof EmailAlreadyExistsException) {
             status = HttpStatus.CONFLICT;
-        } else if (e instanceof InvalidEmailFormatException) {
-            status = HttpStatus.BAD_REQUEST;
         } else {
             status = HttpStatus.BAD_REQUEST;
         }
