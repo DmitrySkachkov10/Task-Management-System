@@ -1,7 +1,7 @@
 package by.dmitry_skachkov.taskservice.controller;
 
-import by.dmitry_skachkov.taskservice.core.dto.TaskCreateDto;
-import by.dmitry_skachkov.taskservice.core.dto.UpdateTaskDto;
+import by.dmitry_skachkov.taskservice.core.dto.task.TaskCreateDto;
+import by.dmitry_skachkov.taskservice.core.dto.task.UpdateTaskDto;
 import by.dmitry_skachkov.taskservice.service.TaskServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
