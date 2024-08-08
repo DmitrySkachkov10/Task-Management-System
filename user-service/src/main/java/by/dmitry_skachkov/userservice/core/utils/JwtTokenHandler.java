@@ -1,7 +1,7 @@
 package by.dmitry_skachkov.userservice.core.utils;
 
 import by.dmitry_skachkov.userservice.conf.properties.JwtProperty;
-import by.dmitryskachkov.exception.exceptions.TokenException;
+import by.dmitryskachkov.exception.exceptions.token.TokenException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;

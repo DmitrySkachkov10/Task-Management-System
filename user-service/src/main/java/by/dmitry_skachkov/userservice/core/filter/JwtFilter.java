@@ -2,7 +2,7 @@ package by.dmitry_skachkov.userservice.core.filter;
 
 import by.dmitry_skachkov.userservice.core.utils.JwtTokenHandler;
 import by.dmitry_skachkov.userservice.core.utils.UserAuth;
-import by.dmitryskachkov.exception.exceptions.TokenException;
+import by.dmitryskachkov.exception.exceptions.token.TokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
