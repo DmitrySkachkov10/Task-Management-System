@@ -1,10 +1,10 @@
 package by.dmitry_skachkov.userservice.service;
 
-import by.dmitry_skachkov.userservice.core.dto.UserDTO;
+import by.dmitry_skachkov.userservice.core.dto.UserRegistration;
 import by.dmitry_skachkov.userservice.repo.UserRepo;
 
+import by.dmitryskachkov.exception.exceptions.ValidationException;
 import by.dmitryskachkov.exception.exceptions.email.EmailAlreadyExistsException;
-import by.dmitryskachkov.exception.exceptions.email.InvalidEmailFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,13 +26,13 @@ class UserServiceImplTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private UserRepo userRepository;
-    private UserDTO validUserDTO;
-    private UserDTO invalidEmailUserDTO;
+    private UserRegistration validUserRegistration;
+    private UserRegistration invalidEmailUserRegistration;
 
     @BeforeEach
     void setUp() {
-        validUserDTO = new UserDTO("test.email@gmail.com", "test_password");
-        invalidEmailUserDTO = new UserDTO("badEmailFormat.com", "test_password");
+        validUserRegistration = new UserRegistration("test.email@gmail.com", "test_password");
+        invalidEmailUserRegistration = new UserRegistration("badEmailFormat.com", "test_password");
     }
 
 
@@ -41,7 +41,7 @@ class UserServiceImplTest {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedString");
 
-        userService.createUser(validUserDTO);
+        userService.createUser(validUserRegistration);
 
         verify(userRepository, times(1)).existsByEmail(anyString());
         verify(userRepository, times(1)).save(any());
@@ -49,13 +49,13 @@ class UserServiceImplTest {
 
     @Test
     void createUser_withInvalidEmail_throwException() {
-        assertThrows(InvalidEmailFormatException.class, () -> userService.createUser(invalidEmailUserDTO));
+        assertThrows(ValidationException.class, () -> userService.createUser(invalidEmailUserRegistration));
     }
 
     @Test
     void createUser_withAlreadyExistsEmail_throwException() {
         when(userRepository.existsByEmail(anyString())).thenReturn(true);
 
-        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(validUserDTO));
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.createUser(validUserRegistration));
     }
 }

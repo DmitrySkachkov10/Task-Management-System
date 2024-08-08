@@ -1,12 +1,16 @@
 package by.dmitry_skachkov.userservice.service.api;
 
-import by.dmitry_skachkov.userservice.core.dto.UserDTO;
+import by.dmitry_skachkov.userservice.core.dto.UserDto;
+import by.dmitry_skachkov.userservice.core.dto.UserLogin;
+import by.dmitry_skachkov.userservice.core.dto.UserRegistration;
 
 
 public interface UserService {
 
-    void createUser(UserDTO userDTO);
+    void createUser(UserRegistration userRegistration);
 
-    String logIn(UserDTO userDTO);
+    String logIn(UserLogin userLogin);
+
+    UserDto myInfo();
 
 }
