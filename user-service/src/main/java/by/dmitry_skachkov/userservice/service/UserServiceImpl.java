@@ -1,5 +1,6 @@
 package by.dmitry_skachkov.userservice.service;
 
+import by.dmitry_skachkov.userservice.core.dto.PageOfUser;
 import by.dmitry_skachkov.userservice.core.dto.UserDto;
 import by.dmitry_skachkov.userservice.core.dto.UserLogin;
 import by.dmitry_skachkov.userservice.core.dto.UserRegistration;
@@ -11,14 +12,20 @@ import by.dmitry_skachkov.userservice.repo.UserRepo;
 import by.dmitry_skachkov.userservice.service.api.UserService;
 import by.dmitryskachkov.exception.exceptions.ValidationException;
 import by.dmitryskachkov.exception.exceptions.email.EmailAlreadyExistsException;
+
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -87,6 +94,34 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepo.findById(UUID.fromString(auth.getUUID()))
                 .orElseThrow(() -> new RuntimeException("Can`t get data"));
 
-        return new UserDto(userEntity.getEmail());
+        return new UserDto(userEntity.getUuid().toString(), userEntity.getEmail());
+    }
+
+    @Override
+    public PageOfUser getUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<UserEntity> userPage = userRepo.findAll(pageable);
+
+        List<UserDto> userDtos = userPage.getContent().stream()
+                .map(m -> new UserDto(m.getUuid().toString(), m.getEmail()))
+                .collect(Collectors.toList());
+
+        return new PageOfUser(
+                userDtos,
+                userPage.getNumber(),
+                userPage.getSize(),
+                userPage.getTotalElements(),
+                userPage.getTotalPages()
+        );
+    }
+
+
+    @Override
+    public UserDto getUser(UUID uuid) {
+        UserEntity userEntity = userRepo.findById(uuid)
+                .orElseThrow(() -> new RuntimeException("Invalid uuid"));
+
+        return new UserDto(userEntity.getUuid().toString(), userEntity.getEmail());
+
     }
 }

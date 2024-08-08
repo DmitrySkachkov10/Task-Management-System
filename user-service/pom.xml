@@ -14,6 +14,7 @@
     <description>User sign/log in microservice</description>
     <packaging>jar</packaging>
 
+
     <build>
         <plugins>
             <plugin>
