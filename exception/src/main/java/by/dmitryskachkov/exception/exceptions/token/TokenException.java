@@ -1,4 +1,4 @@
-package by.dmitryskachkov.exception.exceptions;
+package by.dmitryskachkov.exception.exceptions.token;
 
 import org.springframework.http.HttpStatusCode;
 
