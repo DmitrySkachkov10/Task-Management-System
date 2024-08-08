@@ -6,7 +6,6 @@
         <groupId>by.dmitry_skachkov</groupId>
         <artifactId>Task-Management-System</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/>
     </parent>
 
     <groupId>by.dmitry_skachkov</groupId>
@@ -14,6 +13,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>user-service</name>
     <description>User sign/log in microservice</description>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>21</java.version>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>RELEASE</version>
+            <version>1.18.34</version>
             <scope>compile</scope>
         </dependency>
 
