@@ -1,5 +1,7 @@
 package by.dmitry_skachkov.taskservice.model;
 
+import by.dmitryskachkov.exception.exceptions.ValidationException;
+
 public enum Priority {
     HIGH,
     MEDIUM,
@@ -9,7 +11,7 @@ public enum Priority {
         try {
             return Priority.valueOf(value);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Priority: " + value);
+            throw new ValidationException("Invalid Priority: " + value);
         }
     }
 }

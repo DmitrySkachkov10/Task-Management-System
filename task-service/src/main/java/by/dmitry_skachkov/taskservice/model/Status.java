@@ -1,5 +1,7 @@
 package by.dmitry_skachkov.taskservice.model;
 
+import by.dmitryskachkov.exception.exceptions.ValidationException;
+
 public enum Status {
     IN_PROGRESS,
     FINISHED,
@@ -10,7 +12,7 @@ public enum Status {
         try {
             return Status.valueOf(value);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Status: " + value);
+            throw new ValidationException("Invalid Status: " + value);
         }
     }
 }
