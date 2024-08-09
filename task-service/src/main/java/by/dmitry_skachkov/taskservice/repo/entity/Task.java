@@ -3,13 +3,8 @@ package by.dmitry_skachkov.taskservice.repo.entity;
 import by.dmitry_skachkov.taskservice.model.Priority;
 import by.dmitry_skachkov.taskservice.model.Status;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.util.*;
-
 
 @Entity
 @Table(schema = "task_service", name = "task")
@@ -17,6 +12,7 @@ import java.util.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Task {
 
     @Id
@@ -36,11 +32,11 @@ public class Task {
 
     @Version
     private long version;
-    
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<TaskPerformer> taskPerformers = new HashSet<>();
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
 
     @Override
@@ -48,11 +44,17 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(uuid, task.uuid) && Objects.equals(description, task.description) && Objects.equals(header, task.header) && Objects.equals(authorUuid, task.authorUuid) && status == task.status && priority == task.priority;
+        return version == task.version &&
+                Objects.equals(uuid, task.uuid) &&
+                Objects.equals(description, task.description) &&
+                Objects.equals(header, task.header) &&
+                Objects.equals(authorUuid, task.authorUuid) &&
+                status == task.status &&
+                priority == task.priority;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, description, header, authorUuid, status, priority);
+        return Objects.hash(uuid, description, header, authorUuid, status, priority, version);
     }
 }
