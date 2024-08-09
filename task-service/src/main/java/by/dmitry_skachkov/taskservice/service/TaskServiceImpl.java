@@ -68,12 +68,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID uuid) {
         taskRepo.deleteById(uuid);
     }
 
 
     @Override
+    @Transactional
     public void updateTask(TaskCreateDto createDto, long version, UUID uuid) {
         UUID userUuid = securityUtils.getAuthenticatedUserUuid();
 
@@ -123,6 +125,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public void changeStatus(String status, long version, UUID uuid) {
         UUID userUuid = securityUtils.getAuthenticatedUserUuid();
 

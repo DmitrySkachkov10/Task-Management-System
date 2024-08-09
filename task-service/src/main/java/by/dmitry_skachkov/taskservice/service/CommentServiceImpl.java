@@ -9,6 +9,7 @@ import by.dmitry_skachkov.taskservice.repo.entity.Task;
 import by.dmitry_skachkov.taskservice.service.api.CommentService;
 import by.dmitry_skachkov.taskservice.service.api.TaskService;
 import by.dmitryskachkov.exception.exceptions.PerimissionDeniedException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void addComment(CreateCommentDto commentDto) {
 
         TaskDto taskDto = taskService.getByUuid(commentDto.getUuid());
