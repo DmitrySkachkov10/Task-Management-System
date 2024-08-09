@@ -24,4 +24,23 @@ docker-compose up -d
 
 Документация для нашего API предоставляется через Swagger UI. Вы можете получить доступ к интерфейсу Swagger на следующем адресе:
 
-**Swagger UI:** [http://localhost:81]()
+**Swagger UI:** [http://localhost:81](http://localhost:81)
+
+### Доступ к pgAdmin
+
+ Доступ к pgAdmin осуществляется через веб-интерфейс по следующему адресу:
+
+**pgAdmin:** [http://localhost:82](http://localhost:82)
+
+#### Данные для входа в pgAdmin:
+
+- **Логин:** admin@admin.com
+- **Пароль:** admin
+
+#### Подключение к базе данных
+
+После входа в pgAdmin, используйте следующие параметры для подключения к базе данных PostgreSQL:
+
+- **Пользователь:** dmitry
+- **Пароль:** dmitry
+
