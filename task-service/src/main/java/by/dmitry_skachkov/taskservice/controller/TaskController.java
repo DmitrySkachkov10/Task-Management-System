@@ -2,6 +2,8 @@ package by.dmitry_skachkov.taskservice.controller;
 
 import by.dmitry_skachkov.taskservice.core.dto.task.PageOfTask;
 import by.dmitry_skachkov.taskservice.core.dto.task.TaskCreateDto;
+import by.dmitry_skachkov.taskservice.core.dto.task.TaskFilterDto;
+import by.dmitry_skachkov.taskservice.core.resolver.TaskFilterResolver;
 import by.dmitry_skachkov.taskservice.service.TaskServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +28,8 @@ public class TaskController {
     }
 
     @GetMapping()
-    public ResponseEntity<PageOfTask> getTasks(@RequestParam(name = "page", defaultValue = "1") int page,
-                                               @RequestParam(name = "size", defaultValue = "5") int size,
-                                               @RequestParam(name = "uuid", required = false) UUID uuid) {
-        return ResponseEntity.ok().body(taskService.getByUserUuid(uuid, page, size));
+    public ResponseEntity<PageOfTask> getTasks(TaskFilterDto taskFilterDto) {
+        return ResponseEntity.ok().body(taskService.getTasks(taskFilterDto));
     }
 
     @DeleteMapping("/delete/{uuid}")

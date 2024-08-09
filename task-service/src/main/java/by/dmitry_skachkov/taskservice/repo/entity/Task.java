@@ -4,6 +4,7 @@ import by.dmitry_skachkov.taskservice.model.Priority;
 import by.dmitry_skachkov.taskservice.model.Status;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.*;
 
 @Entity
@@ -38,6 +39,10 @@ public class Task {
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
+
+    public Task(UUID uuid) {
+        this.uuid = uuid;
+    }
 
     @Override
     public boolean equals(Object o) {

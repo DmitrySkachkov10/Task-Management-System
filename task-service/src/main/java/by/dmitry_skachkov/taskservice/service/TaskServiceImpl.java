@@ -3,9 +3,9 @@ package by.dmitry_skachkov.taskservice.service;
 import by.dmitry_skachkov.taskservice.core.dto.task.PageOfTask;
 import by.dmitry_skachkov.taskservice.core.dto.task.TaskCreateDto;
 import by.dmitry_skachkov.taskservice.core.dto.task.TaskDto;
+import by.dmitry_skachkov.taskservice.core.dto.task.TaskFilterDto;
 import by.dmitry_skachkov.taskservice.core.mapper.TaskConverter;
 import by.dmitry_skachkov.taskservice.core.utils.SecurityUtils;
-import by.dmitry_skachkov.taskservice.core.utils.UserAuth;
 import by.dmitry_skachkov.taskservice.model.Priority;
 import by.dmitry_skachkov.taskservice.model.Status;
 import by.dmitry_skachkov.taskservice.repo.api.TaskRepo;
@@ -19,7 +19,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -101,27 +100,21 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public PageOfTask getByUserUuid(UUID uuid, int page, int size) {
+    public PageOfTask getTasks(TaskFilterDto taskFilterDto) {
+        Pageable pageable = PageRequest.of(taskFilterDto.getPage() - 1, taskFilterDto.getSize());
+        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
 
-        final UUID userUuid = (uuid != null) ? uuid : SecurityUtils.getAuthenticatedUserUuid(); //if you want your own tasks
+        Page<Task> taskPage;
 
-        Pageable pageable = PageRequest.of(page - 1, size);
+        if (taskFilterDto.isMy()) {
+            taskPage = taskRepo.findByAuthorUuidOrPerformerUuid(userUuid, pageable);
+        } else if (taskFilterDto.getUuid() != null) {
+            taskPage = taskRepo.findByAuthorUuidOrPerformerUuid(taskFilterDto.getUuid(), pageable);
+        } else {
+            taskPage = taskRepo.findAll(pageable);
+        }
 
-        Page<Task> taskPage = taskRepo.findByAuthorUuidOrPerformerUuid(userUuid, pageable);
-
-        List<TaskDto> taskDtos = taskPage.getContent()
-                .stream()
-                .map(task -> convertToTaskDtoWithFlags(task, userUuid))
-                .collect(Collectors.toList());
-
-        PageOfTask pageOfTask = new PageOfTask();
-        pageOfTask.setPageNumber(taskPage.getNumber());
-        pageOfTask.setPageSize(taskPage.getSize());
-        pageOfTask.setTotalPages(taskPage.getTotalPages());
-        pageOfTask.setTotalElements(taskPage.getTotalElements());
-        pageOfTask.setContent(taskDtos);
-
-        return pageOfTask;
+        return convertToPageOfTask(taskPage, userUuid);
     }
 
     @Override
@@ -151,6 +144,22 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new InvalidUuidException("Invalid task UUID: " + uuid));
 
         return taskMapper.toDto(task);
+    }
+
+    private PageOfTask convertToPageOfTask(Page<Task> taskPage, UUID userUuid) {
+        List<TaskDto> taskDtos = taskPage.getContent()
+                .stream()
+                .map(task -> convertToTaskDtoWithFlags(task, userUuid))
+                .collect(Collectors.toList());
+
+        PageOfTask pageOfTask = new PageOfTask();
+        pageOfTask.setPageNumber(taskPage.getNumber());
+        pageOfTask.setPageSize(taskPage.getSize());
+        pageOfTask.setTotalPages(taskPage.getTotalPages());
+        pageOfTask.setTotalElements(taskPage.getTotalElements());
+        pageOfTask.setContent(taskDtos);
+
+        return pageOfTask;
     }
 
     private TaskDto convertToTaskDtoWithFlags(Task task, UUID userUuid) {
