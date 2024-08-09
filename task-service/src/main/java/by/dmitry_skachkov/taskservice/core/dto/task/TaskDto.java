@@ -15,6 +15,8 @@ public class TaskDto {
 
     private boolean performer;
 
+    private String uuid;
+
     private String header;
 
     private String description;
@@ -25,7 +27,9 @@ public class TaskDto {
 
     private String authorUuid;
 
-    private List<String> comments = new ArrayList<>();
+    private long version;
+
+    private Set<String> comments = new HashSet<>();
 
     private Set<UUID> performersUuid = new HashSet<>();
 
