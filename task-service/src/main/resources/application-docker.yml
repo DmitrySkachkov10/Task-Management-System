@@ -7,7 +7,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: jdbc:postgresql://bd2/task-db
+    url: jdbc:postgresql://db2/task-db
     username: dmitry
     password: dmitry
 
