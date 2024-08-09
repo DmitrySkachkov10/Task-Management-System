@@ -7,8 +7,9 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 
+@Component
 public class SecurityUtils {
-    public static UUID getAuthenticatedUserUuid() {
+    public  UUID getAuthenticatedUserUuid() {
         UserAuth userAuth = (UserAuth) SecurityContextHolder
                 .getContext()
                 .getAuthentication()

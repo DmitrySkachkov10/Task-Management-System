@@ -31,18 +31,22 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepo taskRepo;
 
+    private final SecurityUtils securityUtils;
+
     private final TaskConverter taskMapper;
 
-    public TaskServiceImpl(TaskRepo taskRepo, TaskConverter taskMapper) {
+    public TaskServiceImpl(TaskRepo taskRepo, SecurityUtils securityUtils, TaskConverter taskMapper) {
         this.taskRepo = taskRepo;
+        this.securityUtils = securityUtils;
         this.taskMapper = taskMapper;
     }
+
 
     @Override
     @Transactional
     public void create(TaskCreateDto taskCreate) {
 
-        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
+        UUID userUuid = securityUtils.getAuthenticatedUserUuid();
 
         Task task = Task.builder()
                 .uuid(UUID.randomUUID())
@@ -71,7 +75,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void updateTask(TaskCreateDto createDto, long version, UUID uuid) {
-        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
+        UUID userUuid = securityUtils.getAuthenticatedUserUuid();
 
 
         Task task = taskRepo.findById(uuid)
@@ -103,7 +107,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public PageOfTask getTasks(TaskFilterDto taskFilterDto) {
         Pageable pageable = PageRequest.of(taskFilterDto.getPage() - 1, taskFilterDto.getSize());
-        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
+        UUID userUuid = securityUtils.getAuthenticatedUserUuid();
 
         Page<Task> taskPage;
 
@@ -120,7 +124,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void changeStatus(String status, long version, UUID uuid) {
-        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
+        UUID userUuid = securityUtils.getAuthenticatedUserUuid();
 
         Task task = taskRepo.findById(uuid)
                 .orElseThrow(() -> new InvalidUuidException("Invalid task UUID: " + uuid));

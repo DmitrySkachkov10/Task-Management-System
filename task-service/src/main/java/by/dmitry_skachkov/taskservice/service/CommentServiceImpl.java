@@ -19,16 +19,19 @@ public class CommentServiceImpl implements CommentService {
     private final TaskService taskService;
     private final CommentRepo commentRepo;
 
-    public CommentServiceImpl(TaskService taskService, CommentRepo commentRepo) {
+    private final SecurityUtils securityUtils;
+
+    public CommentServiceImpl(TaskService taskService, CommentRepo commentRepo, SecurityUtils securityUtils) {
         this.taskService = taskService;
         this.commentRepo = commentRepo;
+        this.securityUtils = securityUtils;
     }
 
     @Override
     public void addComment(CreateCommentDto commentDto) {
 
         TaskDto taskDto = taskService.getByUuid(commentDto.getUuid());
-        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
+        UUID userUuid = securityUtils.getAuthenticatedUserUuid();
 
         boolean isAuthor = taskDto.getAuthorUuid().equals(userUuid.toString());
         boolean isPerformer = taskDto.getPerformersUuid().stream()
