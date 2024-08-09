@@ -4,6 +4,7 @@ import by.dmitry_skachkov.taskservice.core.dto.task.PageOfTask;
 import by.dmitry_skachkov.taskservice.core.dto.task.TaskCreateDto;
 import by.dmitry_skachkov.taskservice.core.dto.task.TaskDto;
 import by.dmitry_skachkov.taskservice.core.mapper.TaskConverter;
+import by.dmitry_skachkov.taskservice.core.utils.SecurityUtils;
 import by.dmitry_skachkov.taskservice.core.utils.UserAuth;
 import by.dmitry_skachkov.taskservice.model.Priority;
 import by.dmitry_skachkov.taskservice.model.Status;
@@ -42,7 +43,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public void create(TaskCreateDto taskCreate) {
 
-        UUID userUuid = getAuthenticatedUserUuid();
+        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
 
         Task task = Task.builder()
                 .uuid(UUID.randomUUID())
@@ -71,7 +72,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void updateTask(TaskCreateDto createDto, long version, UUID uuid) {
-        UUID userUuid = getAuthenticatedUserUuid();
+        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
 
         Task task = taskRepo.findById(uuid)
                 .orElseThrow(() -> new InvalidUuidException("Invalid task UUID: " + uuid));
@@ -102,7 +103,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public PageOfTask getByUserUuid(UUID uuid, int page, int size) {
 
-        final UUID userUuid = (uuid != null) ? uuid : getAuthenticatedUserUuid(); //if you want your own tasks
+        final UUID userUuid = (uuid != null) ? uuid : SecurityUtils.getAuthenticatedUserUuid(); //if you want your own tasks
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -125,7 +126,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void changeStatus(String status, long version, UUID uuid) {
-        UUID userUuid = getAuthenticatedUserUuid();
+        UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
 
         Task task = taskRepo.findById(uuid)
                 .orElseThrow(() -> new InvalidUuidException("Invalid task UUID: " + uuid));
@@ -144,6 +145,13 @@ public class TaskServiceImpl implements TaskService {
         taskRepo.save(task);
     }
 
+    @Override
+    public TaskDto getByUuid(UUID uuid) {
+        Task task = taskRepo.findById(uuid)
+                .orElseThrow(() -> new InvalidUuidException("Invalid task UUID: " + uuid));
+
+        return taskMapper.toDto(task);
+    }
 
     private TaskDto convertToTaskDtoWithFlags(Task task, UUID userUuid) {
         TaskDto dto = taskMapper.toDto(task);
@@ -159,11 +167,4 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-    private UUID getAuthenticatedUserUuid() {
-        UserAuth userAuth = (UserAuth) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return UUID.fromString(userAuth.getUUID());
-    }
 }
