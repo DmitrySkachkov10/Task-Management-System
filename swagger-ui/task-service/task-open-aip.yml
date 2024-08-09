@@ -1,0 +1,305 @@
+openapi: 3.0.3
+info:
+  title: Task Service API
+  description: API для управления задачами и комментариями
+  version: 1.0.0
+paths:
+  /task/create:
+    post:
+      summary: Создать новую задачу
+      security:
+        - BearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreateDto'
+      responses:
+        '201':
+          description: Задача успешно создана
+        '400':
+          description: Ошибка валидации
+        '403':
+          description: Запрещено
+  /task:
+    get:
+      summary: Получить список задач
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Номер страницы для пагинации результатов.
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 5
+          description: Количество задач на одной странице.
+        - name: uuid
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: |
+            Если не указать `uuid`, будут возвращены все задачи.
+            Если указать `uuid`, будут возвращены задачи, где пользователь с этим `uuid` является автором или одним из исполнителей.
+        - name: my
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: |
+            Если `true`, будут возвращены только задачи, связанные с текущим пользователем (UUID пользователя извлекается из контекста безопасности).
+            Если `false`, возвращаются задачи согласно другим фильтрам.
+      responses:
+        '200':
+          description: Список задач
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageOfTask'
+        '400':
+          description: Ошибка валидации
+
+  /task/delete/{uuid}:
+    delete:
+      summary: Удалить задачу
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Задача успешно удалена
+        '404':
+          description: Задача не найдена
+        '403':
+          description: Запрещено
+
+  /task/update/{uuid}/version/{version}:
+    put:
+      summary: Обновить задачу
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            Исполнитель может менять статус только через эндпоинт `/task/update/status/{uuid}/version/{version}`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreateDto'
+        description: |
+          Обновление задачи может быть выполнено только её автором.
+      responses:
+        '200':
+          description: Задача успешно обновлена
+        '400':
+          description: Ошибка валидации
+        '403':
+          description: |
+            Запрещено. Задачу может обновлять только её автор.
+        '409':
+          description: Конфликт версий
+
+  /task/update/status/{uuid}/version/{version}:
+    put:
+      summary: Обновить статус задачи
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: true
+          schema:
+            type: string
+          description: |
+            Обновление статуса задачи может быть выполнено только исполнителем задачи.
+      responses:
+        '200':
+          description: Статус задачи успешно обновлен
+        '400':
+          description: Ошибка валидации
+        '403':
+          description: |
+            Запрещено. Статус задачи может обновлять только исполнитель задачи.
+        '409':
+          description: Конфликт версий
+
+  /comment/create:
+    post:
+      summary: Создать новый комментарий
+      security:
+        - BearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentDto'
+        description: |
+          Комментарий может быть добавлен только автором задачи или одним из её исполнителей.
+          Если пользователь не является автором или исполнителем задачи, будет возвращена ошибка 403.
+      responses:
+        '201':
+          description: Комментарий успешно создан
+        '400':
+          description: Ошибка валидации
+        '403':
+          description: |
+            Запрещено добавлять комментарии. Комментарии могут быть добавлены только автором задачи или одним из исполнителей.
+
+components:
+  schemas:
+    CreateCommentDto:
+      type: object
+      properties:
+        text:
+          type: string
+          description: Текст комментария.
+        uuid:
+          type: string
+          format: uuid
+          description: UUID задачи, к которой добавляется комментарий. Пользователь должен быть автором или исполнителем этой задачи.
+      required:
+        - text
+        - uuid
+
+    TaskCreateDto:
+      type: object
+      properties:
+        header:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        priority:
+          type: string
+        performersUuid:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+        - header
+        - description
+        - status
+        - priority
+
+    TaskDto:
+      type: object
+      properties:
+        author:
+          type: boolean
+        performer:
+          type: boolean
+        uuid:
+          type: string
+          format: uuid
+        header:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        priority:
+          type: string
+        authorUuid:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        comments:
+          type: array
+          items:
+            type: string
+        performersUuid:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    PageOfTask:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskDto'
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    TaskFilterDto:
+      type: object
+      properties:
+        page:
+          type: integer
+          default: 1
+          description: Номер страницы для пагинации результатов.
+        size:
+          type: integer
+          default: 5
+          description: Количество задач на одной странице.
+        uuid:
+          type: string
+          format: uuid
+          description: |
+            Если не указать `uuid`, будут возвращены все задачи.
+            Если указать `uuid`, будут возвращены задачи, где пользователь с этим `uuid` является автором или одним из исполнителей.
+        my:
+          type: boolean
+          default: false
+          description: |
+            Если `true`, будут возвращены только задачи, связанные с текущим пользователем (UUID пользователя извлекается из контекста безопасности).
+            Если `false`, возвращаются задачи согласно другим фильтрам.
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

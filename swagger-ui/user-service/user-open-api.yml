@@ -1,0 +1,151 @@
+openapi: 3.0.1
+info:
+  title: User Service API
+  description: API для управления пользователями
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Локальный сервер
+paths:
+  /user/registration:
+    post:
+      summary: Регистрация нового пользователя
+      requestBody:
+        description: Данные для регистрации пользователя
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        required: true
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+        '400':
+          description: Неверный формат данных
+        '409':
+          description: Email уже существует
+  /user/login:
+    post:
+      summary: Аутентификация пользователя и получение токена
+      requestBody:
+        description: Данные для входа пользователя
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      responses:
+        '200':
+          description: Успешный вход и получение токена
+          content:
+            application/json:
+              schema:
+                type: string
+        '401':
+          description: Неверные email или пароль
+  /user/me:
+    get:
+      summary: Получение информации о текущем аутентифицированном пользователе
+      responses:
+        '200':
+          description: Информация о пользователе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '401':
+          description: Неавторизован
+  /user:
+    get:
+      summary: Получение списка пользователей с пагинацией
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          description: Размер страницы
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageOfUser'
+  /user/{uuid}:
+    get:
+      summary: Получение информации о пользователе по UUID
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация о пользователе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '404':
+          description: Пользователь не найден
+components:
+  schemas:
+    UserRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required:
+        - email
+        - password
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required:
+        - email
+        - password
+    UserDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+    PageOfUser:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDto'
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
