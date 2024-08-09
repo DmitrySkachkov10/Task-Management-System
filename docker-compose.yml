@@ -9,6 +9,16 @@ services:
       POSTGRES_DB: user-db
       POSTGRES_USER: dmitry
       POSTGRES_PASSWORD: dmitry
+
+  db2:
+    build: postgres2
+    image: task_management_task_db:1.0.0
+    restart: always
+    environment:
+      POSTGRES_DB: task-db
+      POSTGRES_USER: dmitry
+      POSTGRES_PASSWORD: dmitry
+
   pgAdmin:
     build: pgAdmin
     image: task_management_pgadmin:1.0.0
@@ -27,3 +37,13 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
       - db
+
+  task-service:
+    build: ./task-service
+    image: task_management_task_service:1.0.0
+    ports:
+      - "9091:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - db2

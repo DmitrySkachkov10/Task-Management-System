@@ -8,6 +8,15 @@
       "Host": "db",
       "SSLMode": "prefer",
       "MaintenanceDB": "postgres"
+    },
+    "2": {
+      "Name": "Task_Management_System",
+      "Group": "Server Group 1",
+      "Port": 5432,
+      "Username": "dmitry",
+      "Host": "db2",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
     }
   }
 }

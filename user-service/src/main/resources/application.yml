@@ -1,6 +1,9 @@
 spring:
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
   application:
     name: user-service
   profiles:
     active:
-      - docker
+      - local
