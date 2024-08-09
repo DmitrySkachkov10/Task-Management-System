@@ -1,13 +1,14 @@
 package by.dmitry_skachkov.taskservice.service;
 
 import by.dmitry_skachkov.taskservice.core.dto.comment.CreateCommentDto;
+import by.dmitry_skachkov.taskservice.core.dto.task.TaskDto;
 import by.dmitry_skachkov.taskservice.core.utils.SecurityUtils;
 import by.dmitry_skachkov.taskservice.repo.api.CommentRepo;
 import by.dmitry_skachkov.taskservice.repo.entity.Comment;
 import by.dmitry_skachkov.taskservice.repo.entity.Task;
 import by.dmitry_skachkov.taskservice.service.api.CommentService;
 import by.dmitry_skachkov.taskservice.service.api.TaskService;
-import by.dmitryskachkov.exception.exceptions.InvalidUuidException;
+import by.dmitryskachkov.exception.PerimissionDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -26,19 +27,22 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void addComment(CreateCommentDto commentDto) {
 
-        if (taskService.getByUuid(commentDto.getTaskUuid()) == null) {
-            throw new InvalidUuidException("invalid uuid " + commentDto.getTaskUuid());
-        }
-
-        Task task = new Task();
-        task.setUuid(commentDto.getTaskUuid());
-
+        TaskDto taskDto = taskService.getByUuid(commentDto.getUuid());
         UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
-        Comment comment = new Comment(UUID.randomUUID(),
-                commentDto.getText(),
-                userUuid,
-                task);
 
-        commentRepo.save(comment);
+        boolean isAuthor = taskDto.getAuthorUuid().equals(userUuid.toString());
+        boolean isPerformer = taskDto.getPerformersUuid().stream()
+                .anyMatch(uuid -> uuid.equals(userUuid));
+
+        if (!isAuthor && !isPerformer) {
+            //is not the author or performer
+            throw new PerimissionDeniedException("User does not have permission to add comments to this task");
+        } else {
+            Comment comment = new Comment(UUID.randomUUID(),
+                    commentDto.getText(),
+                    userUuid,
+                    new Task(commentDto.getUuid()));
+            commentRepo.save(comment);
+        }
     }
 }

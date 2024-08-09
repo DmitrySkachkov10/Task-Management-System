@@ -13,5 +13,5 @@ public class CreateCommentDto {
 
     private String text;
 
-    private UUID taskUuid;
+    private UUID uuid;
 }
