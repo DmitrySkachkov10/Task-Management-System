@@ -1,4 +1,4 @@
-package by.dmitryskachkov.exception;
+package by.dmitryskachkov.exception.exceptions;
 
 public class PerimissionDeniedException extends RuntimeException{
     public PerimissionDeniedException(String message) {

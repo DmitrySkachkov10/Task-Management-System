@@ -8,7 +8,7 @@ import by.dmitry_skachkov.taskservice.repo.entity.Comment;
 import by.dmitry_skachkov.taskservice.repo.entity.Task;
 import by.dmitry_skachkov.taskservice.service.api.CommentService;
 import by.dmitry_skachkov.taskservice.service.api.TaskService;
-import by.dmitryskachkov.exception.PerimissionDeniedException;
+import by.dmitryskachkov.exception.exceptions.PerimissionDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

@@ -1,9 +1,7 @@
 package by.dmitry_skachkov.taskservice.controller;
 
 
-import by.dmitryskachkov.exception.exceptions.InvalidUuidException;
-import by.dmitryskachkov.exception.exceptions.UnauthorizedActionException;
-import by.dmitryskachkov.exception.exceptions.VersionConflictException;
+import by.dmitryskachkov.exception.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +9,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalHandlerController {
+
+    @ExceptionHandler(PerimissionDeniedException.class)
+
+    public ResponseEntity<String> handlePerimissionDeniedException(PerimissionDeniedException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<String> handleValidationException(ValidationException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(InvalidUuidException.class)
     public ResponseEntity<String> handleInvalidUuidException(InvalidUuidException ex) {

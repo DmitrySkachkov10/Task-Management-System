@@ -73,6 +73,7 @@ public class TaskServiceImpl implements TaskService {
     public void updateTask(TaskCreateDto createDto, long version, UUID uuid) {
         UUID userUuid = SecurityUtils.getAuthenticatedUserUuid();
 
+
         Task task = taskRepo.findById(uuid)
                 .orElseThrow(() -> new InvalidUuidException("Invalid task UUID: " + uuid));
 
