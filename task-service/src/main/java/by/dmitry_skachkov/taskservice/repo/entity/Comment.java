@@ -29,6 +29,7 @@ public class Comment {
     @JoinColumn(name = "task_uuid")
     private Task task;
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
